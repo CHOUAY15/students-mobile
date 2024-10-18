@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:id="@+id/main"
+    tools:context=".MainActivity">
+
+    <!-- Add this after the RadioGroup in your activity_add_etudiant.xml -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Photo :"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:padding="8dp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/student" />
+
+    <Button
+        android:id="@+id/btnSelectImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Sélectionner une image"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nom :"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:padding="8dp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/nom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:padding="8dp"
+        android:textColor="#000"
+        android:background="#e0e0e0"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Prenom :"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:padding="8dp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/prenom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:padding="8dp"
+        android:textColor="#000"
+        android:background="#e0e0e0"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ville"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:padding="8dp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/ville"
+        android:entries="@array/villes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="#e0e0e0"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sexe :"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:padding="8dp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Homme"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            android:textColor="#000" />
+
+        <RadioButton
+            android:id="@+id/f"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Femme"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            android:textColor="#000" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:textSize="18sp"
+        android:textColor="#fff"
+        android:background="#3F51B5"
+        android:padding="12dp"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

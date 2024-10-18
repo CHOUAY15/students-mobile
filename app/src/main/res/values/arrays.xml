@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="villes">
+        <item>Sélectionnez une ville</item>
+        <item>Casablanca</item>
+        <item>Rabat</item>
+        <item>Marrakech</item>
+        <item>Fès</item>
+        <item>Tanger</item>
+        <!-- Ajoutez d'autres villes selon vos besoins -->
+    </string-array>
+</resources>
