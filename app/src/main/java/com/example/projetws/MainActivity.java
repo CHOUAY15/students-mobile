@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.projetws.adapter.EtudiantAdapter;
 import com.example.projetws.entities.Etudiant;
 import com.example.projetws.repository.StudentRepository;
+import com.example.projetws.util.SwipeToDeleteCallback;
 
 
 import org.json.JSONObject;
@@ -93,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
         etudiantList = new ArrayList<>();
         adapter = new EtudiantAdapter(etudiantList, this);
         recyclerView.setAdapter(adapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     private void fetchEtudiants() {

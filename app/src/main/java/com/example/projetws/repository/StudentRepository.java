@@ -9,6 +9,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.projetws.entities.Etudiant;
 import com.example.projetws.util.VolleyMultipartRequest;
@@ -28,6 +29,7 @@ import java.util.Map;
 public class StudentRepository {
 
     private RequestQueue requestQueue;
+    private static final String BASE_URL = "http://10.0.2.2:4000/api/etudiants";
     private static final String FETCH_URL = "http://10.0.2.2:4000/api/etudiants";
     private static final String ADD_URL = "http://10.0.2.2:4000/api/etudiants";
 
@@ -46,6 +48,7 @@ public class StudentRepository {
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject jsonObject = response.getJSONObject(i);
                                 Etudiant etudiant = new Etudiant();
+                                etudiant.setId(jsonObject.getInt("id"));
                                 etudiant.setNom(jsonObject.getString("nom"));
                                 etudiant.setPrenom(jsonObject.getString("prenom"));
                                 etudiant.setVille(jsonObject.getString("ville"));
@@ -139,6 +142,30 @@ public class StudentRepository {
     // Callback interface for adding students
     public interface AddCallback {
         void onSuccess(JSONObject result);
+        void onError(String error);
+    }
+
+    public void deleteEtudiant(int id, final DeleteCallback callback) {
+        String deleteUrl = BASE_URL + "/" + id;
+
+        StringRequest deleteRequest = new StringRequest(Request.Method.DELETE, deleteUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        callback.onSuccess();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError(error.getMessage());
+                    }
+                });
+
+        requestQueue.add(deleteRequest);
+    }
+    public interface DeleteCallback {
+        void onSuccess();
         void onError(String error);
     }
 }
