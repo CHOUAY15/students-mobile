@@ -1,5 +1,10 @@
 package com.example.projetws;
 
+import androidx.appcompat.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import androidx.appcompat.widget.SearchView;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;

@@ -3,6 +3,7 @@ package com.example.projetws.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.projetws.DetailleEtudiantActivity;
 import com.example.projetws.R;
 import com.example.projetws.entities.Etudiant;
 import com.example.projetws.repository.StudentRepository;
@@ -50,6 +52,15 @@ public class EtudiantAdapter extends RecyclerView.Adapter<EtudiantAdapter.ViewHo
         Glide.with(context)
                 .load(etudiant.getFullImageUrl())
                 .into(holder.imageViewEtudiant);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, DetailleEtudiantActivity.class);
+                intent.putExtra("etudiant", etudiant);
+                context.startActivity(intent);
+            }
+        });
     }
 
     public void showDeleteConfirmationDialog(final int position) {

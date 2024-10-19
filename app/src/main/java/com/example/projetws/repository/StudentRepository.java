@@ -168,4 +168,43 @@ public class StudentRepository {
         void onSuccess();
         void onError(String error);
     }
+    public void updateEtudiant(int id, String nom, String prenom, String ville, String sexe, final UpdateCallback callback) {
+        String updateUrl = BASE_URL + "/" + id;
+
+        StringRequest updateRequest = new StringRequest(Request.Method.PUT, updateUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            callback.onSuccess(result);
+                        } catch (JSONException e) {
+                            callback.onError(e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError(error.getMessage());
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("nom", nom.trim());
+                params.put("prenom", prenom.trim());
+                params.put("ville", ville.trim());
+                params.put("sexe", sexe);
+                return params;
+            }
+        };
+
+        requestQueue.add(updateRequest);
+    }
+
+    public interface UpdateCallback {
+        void onSuccess(JSONObject result);
+        void onError(String error);
+    }
 }

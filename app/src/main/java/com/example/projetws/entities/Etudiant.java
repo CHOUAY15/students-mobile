@@ -1,6 +1,8 @@
 package com.example.projetws.entities;
 
-public class Etudiant {
+import java.io.Serializable;
+
+public class Etudiant implements Serializable {
     private Integer id;
     private String nom;
     private String prenom;
