@@ -168,15 +168,17 @@ public class StudentRepository {
         void onSuccess();
         void onError(String error);
     }
-    public void updateEtudiant(int id, String nom, String prenom, String ville, String sexe, final UpdateCallback callback) {
+    public void updateEtudiant(int id, String nom, String prenom, String ville, String sexe,
+                               Uri imageUri, Context context, final UpdateCallback callback) {
         String updateUrl = BASE_URL + "/" + id;
 
-        StringRequest updateRequest = new StringRequest(Request.Method.PUT, updateUrl,
-                new Response.Listener<String>() {
+        VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.PUT, updateUrl,
+                new Response.Listener<NetworkResponse>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(NetworkResponse response) {
                         try {
-                            JSONObject result = new JSONObject(response);
+                            String resultResponse = new String(response.data);
+                            JSONObject result = new JSONObject(resultResponse);
                             callback.onSuccess(result);
                         } catch (JSONException e) {
                             callback.onError(e.getMessage());
@@ -198,9 +200,23 @@ public class StudentRepository {
                 params.put("sexe", sexe);
                 return params;
             }
+
+            @Override
+            protected Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+                if (imageUri != null) {
+                    try {
+                        byte[] imageData = getFileDataFromUri(imageUri, context);
+                        params.put("image", new DataPart("image.jpg", imageData, "image/jpeg"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return params;
+            }
         };
 
-        requestQueue.add(updateRequest);
+        requestQueue.add(multipartRequest);
     }
 
     public interface UpdateCallback {

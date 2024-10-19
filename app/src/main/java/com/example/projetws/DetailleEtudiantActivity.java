@@ -1,5 +1,7 @@
 package com.example.projetws;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -21,6 +23,8 @@ import com.example.projetws.repository.StudentRepository;
 import org.json.JSONObject;
 
 public class DetailleEtudiantActivity extends AppCompatActivity {
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri selectedImageUri = null;
     private ImageView imageViewEtudiant;
     private EditText editNom, editPrenom;
     private Spinner spinnerVille;
@@ -122,6 +126,20 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
                 displayStudentData();
             }
         });
+        imageViewEtudiant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editNom.isEnabled()) {  // Only allow image selection when editing
+                    openImagePicker();
+                }
+            }
+        });
+    }
+    private void openImagePicker() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
     }
 
     private void enableEditing(boolean enable) {
@@ -132,6 +150,24 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
         radioFemme.setEnabled(enable);
         layoutButtons.setVisibility(enable ? View.VISIBLE : View.GONE);
         btnModifier.setVisibility(enable ? View.GONE : View.VISIBLE);
+        imageViewEtudiant.setClickable(enable);
+        layoutButtons.setVisibility(enable ? View.VISIBLE : View.GONE);
+        btnModifier.setVisibility(enable ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            selectedImageUri = data.getData();
+
+            // Preview the selected image
+            Glide.with(this)
+                    .load(selectedImageUri)
+                    .into(imageViewEtudiant);
+        }
     }
 
     private void updateStudent() {
@@ -148,12 +184,15 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
                 currentEtudiant.getPrenom(),
                 currentEtudiant.getVille(),
                 currentEtudiant.getSexe(),
+                selectedImageUri,  // or pass imageUri if you want to update the image
+                this,
                 new StudentRepository.UpdateCallback() {
                     @Override
                     public void onSuccess(JSONObject result) {
                         Toast.makeText(DetailleEtudiantActivity.this,
                                 "Étudiant modifié avec succès", Toast.LENGTH_SHORT).show();
                         enableEditing(false);
+                        selectedImageUri = null;
                     }
 
                     @Override
