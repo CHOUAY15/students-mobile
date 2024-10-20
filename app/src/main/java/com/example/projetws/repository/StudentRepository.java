@@ -2,6 +2,7 @@ package com.example.projetws.repository;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -32,6 +33,7 @@ public class StudentRepository {
     private static final String BASE_URL = "http://10.0.2.2:4000/api/etudiants";
     private static final String FETCH_URL = "http://10.0.2.2:4000/api/etudiants";
     private static final String ADD_URL = "http://10.0.2.2:4000/api/etudiants";
+    private static final String TAG = "StudentRepository";
 
     public StudentRepository(Context context) {
         requestQueue = Volley.newRequestQueue(context);
@@ -168,9 +170,8 @@ public class StudentRepository {
         void onSuccess();
         void onError(String error);
     }
-    public void updateEtudiant(int id, String nom, String prenom, String ville, String sexe,
-                               Uri imageUri, Context context, final UpdateCallback callback) {
-        String updateUrl = BASE_URL + "/" + id;
+    public void updateEtudiant(final Etudiant etudiant, Uri imageUri, Context context, final UpdateCallback callback) {
+        String updateUrl = BASE_URL + "/" + etudiant.getId();
 
         VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.PUT, updateUrl,
                 new Response.Listener<NetworkResponse>() {
@@ -181,6 +182,7 @@ public class StudentRepository {
                             JSONObject result = new JSONObject(resultResponse);
                             callback.onSuccess(result);
                         } catch (JSONException e) {
+                            Log.e(TAG, "JSON parsing error: " + e.getMessage());
                             callback.onError(e.getMessage());
                         }
                     }
@@ -188,16 +190,21 @@ public class StudentRepository {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        callback.onError(error.getMessage());
+                        String errorMessage = "Unknown error";
+                        if (error.networkResponse != null) {
+                            errorMessage = "Error code: " + error.networkResponse.statusCode;
+                        }
+                        Log.e(TAG, "Update error: " + errorMessage);
+                        callback.onError(errorMessage);
                     }
                 }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("nom", nom.trim());
-                params.put("prenom", prenom.trim());
-                params.put("ville", ville.trim());
-                params.put("sexe", sexe);
+                params.put("nom", etudiant.getNom().trim());
+                params.put("prenom", etudiant.getPrenom().trim());
+                params.put("ville", etudiant.getVille().trim());
+                params.put("sexe", etudiant.getSexe());
                 return params;
             }
 
@@ -209,7 +216,7 @@ public class StudentRepository {
                         byte[] imageData = getFileDataFromUri(imageUri, context);
                         params.put("image", new DataPart("image.jpg", imageData, "image/jpeg"));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "Error reading image data: " + e.getMessage());
                     }
                 }
                 return params;

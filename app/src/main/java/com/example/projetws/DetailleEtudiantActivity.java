@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.projetws.entities.Etudiant;
 import com.example.projetws.repository.StudentRepository;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DetailleEtudiantActivity extends AppCompatActivity {
@@ -27,13 +28,14 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
     private Uri selectedImageUri = null;
     private ImageView imageViewEtudiant;
     private EditText editNom, editPrenom;
-    private Spinner spinnerVille;
+    private AutoCompleteTextView spinnerVille;
     private RadioButton radioHomme, radioFemme;
     private Button btnModifier, btnValider, btnAnnuler;
     private LinearLayout layoutButtons;
     private RadioGroup radioGroupSexe;
     private StudentRepository studentRepository;
     private Etudiant currentEtudiant;
+    private static final int RESULT_UPDATED = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +77,7 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
 
     private void setupSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.villes, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.villes, android.R.layout.simple_dropdown_item_1line);
         spinnerVille.setAdapter(adapter);
     }
 
@@ -85,10 +86,8 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
             editNom.setText(currentEtudiant.getNom());
             editPrenom.setText(currentEtudiant.getPrenom());
 
-            // Set ville in spinner
-            ArrayAdapter adapter = (ArrayAdapter) spinnerVille.getAdapter();
-            int position = adapter.getPosition(currentEtudiant.getVille());
-            spinnerVille.setSelection(position);
+            // Set ville in AutoCompleteTextView
+            spinnerVille.setText(currentEtudiant.getVille(), false);
 
             // Set sexe
             if (currentEtudiant.getSexe().equals("homme")) {
@@ -135,6 +134,7 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
             }
         });
     }
+
     private void openImagePicker() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -143,16 +143,14 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
     }
 
     private void enableEditing(boolean enable) {
+        spinnerVille.setEnabled(enable);
         editNom.setEnabled(enable);
         editPrenom.setEnabled(enable);
-        spinnerVille.setEnabled(enable);
         radioHomme.setEnabled(enable);
         radioFemme.setEnabled(enable);
         layoutButtons.setVisibility(enable ? View.VISIBLE : View.GONE);
         btnModifier.setVisibility(enable ? View.GONE : View.VISIBLE);
         imageViewEtudiant.setClickable(enable);
-        layoutButtons.setVisibility(enable ? View.VISIBLE : View.GONE);
-        btnModifier.setVisibility(enable ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -171,36 +169,69 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
     }
 
     private void updateStudent() {
+        if (!validateInputs()) {
+            return;
+        }
+
         // Update student object with new values
-        currentEtudiant.setNom(editNom.getText().toString());
-        currentEtudiant.setPrenom(editPrenom.getText().toString());
-        currentEtudiant.setVille(spinnerVille.getSelectedItem().toString());
+        currentEtudiant.setNom(editNom.getText().toString().trim());
+        currentEtudiant.setPrenom(editPrenom.getText().toString().trim());
+        currentEtudiant.setVille(spinnerVille.getText().toString());
         currentEtudiant.setSexe(radioHomme.isChecked() ? "homme" : "femme");
 
-        // Call repository to update student
         studentRepository.updateEtudiant(
-                currentEtudiant.getId(),
-                currentEtudiant.getNom(),
-                currentEtudiant.getPrenom(),
-                currentEtudiant.getVille(),
-                currentEtudiant.getSexe(),
-                selectedImageUri,  // or pass imageUri if you want to update the image
+                currentEtudiant,
+                selectedImageUri,
                 this,
                 new StudentRepository.UpdateCallback() {
                     @Override
                     public void onSuccess(JSONObject result) {
-                        Toast.makeText(DetailleEtudiantActivity.this,
-                                "Étudiant modifié avec succès", Toast.LENGTH_SHORT).show();
-                        enableEditing(false);
-                        selectedImageUri = null;
+                        runOnUiThread(() -> {
+                            try {
+                                if (result.has("imageUrl")) {
+                                    currentEtudiant.setImageUrl(result.getString("imageUrl"));
+                                }
+
+                                Toast.makeText(DetailleEtudiantActivity.this,
+                                        "Étudiant modifié avec succès", Toast.LENGTH_SHORT).show();
+
+                                Intent resultIntent = new Intent();
+                                resultIntent.putExtra("updatedStudent", currentEtudiant);
+                                setResult(RESULT_OK, resultIntent);
+                                finish();
+                            } catch (JSONException e) {
+                                onError(e.getMessage());
+                            }
+                        });
                     }
 
                     @Override
                     public void onError(String error) {
-                        Toast.makeText(DetailleEtudiantActivity.this,
-                                "Erreur lors de la modification: " + error,
-                                Toast.LENGTH_SHORT).show();
+                        runOnUiThread(() -> {
+                            Toast.makeText(DetailleEtudiantActivity.this,
+                                    "Erreur lors de la modification: " + error,
+                                    Toast.LENGTH_LONG).show();
+                        });
                     }
                 });
+    }
+
+    private boolean validateInputs() {
+        if (editNom.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Le nom est requis", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (editPrenom.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Le prénom est requis", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Check if a valid city is selected
+        if (spinnerVille.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "La ville est requise", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 }

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,11 +28,13 @@ public class EtudiantAdapter extends RecyclerView.Adapter<EtudiantAdapter.ViewHo
     private List<Etudiant> etudiants;
     private Context context;
     private StudentRepository studentRepository;
+    private ActivityResultLauncher<Intent> detailActivityLauncher;
 
-    public EtudiantAdapter(List<Etudiant> etudiants, Context context) {
+    public EtudiantAdapter(List<Etudiant> etudiants, Context context,ActivityResultLauncher<Intent> launcher) {
         this.etudiants = etudiants;
         this.context = context;
         this.studentRepository = new StudentRepository(context);
+        this.detailActivityLauncher = launcher;
     }
 
     @NonNull
@@ -58,7 +61,8 @@ public class EtudiantAdapter extends RecyclerView.Adapter<EtudiantAdapter.ViewHo
             public void onClick(View v) {
                 Intent intent = new Intent(context, DetailleEtudiantActivity.class);
                 intent.putExtra("etudiant", etudiant);
-                context.startActivity(intent);
+                // Use the launcher instead of startActivity
+                detailActivityLauncher.launch(intent);
             }
         });
     }
