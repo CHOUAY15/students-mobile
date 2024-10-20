@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.projetws.entities.Etudiant;
 import com.example.projetws.repository.StudentRepository;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +42,8 @@ public class DetailleEtudiantActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detaille_etudiant);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Initialize views
         initViews();
